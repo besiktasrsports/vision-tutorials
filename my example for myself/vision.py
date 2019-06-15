@@ -48,7 +48,7 @@ while True: # -1-
     
     staticColorImage = cv2.inRange(resizedImage,lower_green,upper_green) # inRange looks for objects between lower and upper green values
     
-    #Ècv2.imshow('Static Color Image',staticColorImage) # Show static color image
+    #cv2.imshow('Static Color Image',staticColorImage) # Show static color image
     
     bLow  = cv2.getTrackbarPos(bl, wnd)
     bHigh = cv2.getTrackbarPos(bh, wnd)
@@ -70,6 +70,9 @@ while True: # -1-
     openedImage = cv2.morphologyEx(openedImage, cv2.MORPH_CLOSE, kernel)
     cv2.imshow('opened',openedImage)
     
+    # cv2.CHAIN_APPROX_NONE finds all the contour points around the object. 
+    # (Lots of points - sometimes needed for operation)
+    # cv2.CHAIN_APPROX_SIMPLE finds just the edges. (Less point -memory saving)
     contourImage, contours, hierarchy = cv2.findContours(staticColorImage, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE) #cv2.CHAIN_APPROX_SIMPLE)
     contourIndexes =  []
     contourCounter = 0
@@ -87,13 +90,8 @@ while True: # -1-
     x2,y2,w2,h2 = cv2.boundingRect(cnt2)
     
     cv2.imshow('Filled Image',resizedImage)
-    
-    
-    
-    
-    
-    
+
     keyPressed = cv2.waitKey(1)
     if keyPressed == 27:
         break
-cv2.destroyAllWindows() #
+cv2.destroyAllWindows()
