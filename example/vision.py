@@ -46,11 +46,15 @@ while True:  # -1-
     # cv2.imshow('Test',test_image) # Show test image -1-
 
     resizedImage = cv2.resize(test_image, (300, 300))  # Resize image 300x300
-    resizedImage = resizedImage[125:300, 0:300]
+    resizedImage = resizedImage[125:300, 0:300]  # Cut image
     cv2.imshow('Resized', resizedImage)  # Show resized image
-
+    
     # inRange looks for objects between lower and upper green values
     staticColorImage = cv2.inRange(resizedImage, lower_green, upper_green)
+    greenImage = resizedImage.copy() # Have a backup for your image
+    greenImage[np.where(staticColorImage==0)] = 0 # Apply the mask to the backup image
+    cv2.imshow("Green Image", greenImage) # Let's show the image and the see what we have
+  
 
     # cv2.imshow('Static Color Image',staticColorImage) # Show static color
     # image
@@ -74,7 +78,7 @@ while True:  # -1-
 
     kernel = np.ones((10, 10), np.uint8)
     openedImage = cv2.morphologyEx(
-        maskedImage,
+        staticColorImage,
         cv2.MORPH_OPEN,
         kernel)  # Applying morphological operations
     kernel = np.ones((30, 30), np.uint8)
@@ -93,13 +97,16 @@ while True:  # -1-
         contourIndexes.append(contourCounter)
         contourCounter += 1
         print(contourIndexes)
-
-    cnt = contours[contourIndexes[-1]]
-    cnt2 = contours[contourIndexes[-2]]
-    cv2.drawContours(resizedImage, [cnt], 0, (255, 0, 0), 4)
-    cv2.drawContours(resizedImage, [cnt2], 0, (255, 0, 0), 4)
-    x, y, w, h = cv2.boundingRect(cnt)
-    x2, y2, w2, h2 = cv2.boundingRect(cnt2)
+    if(len(contourIndexes) >= 2):
+        cnt = contours[contourIndexes[-1]]
+        cnt2 = contours[contourIndexes[-2]]
+        cv2.drawContours(resizedImage, [cnt], 0, (255, 0, 0), 4)
+        cv2.drawContours(resizedImage, [cnt2], 0, (255, 0, 0), 4)
+        x, y, w, h = cv2.boundingRect(cnt)
+        x2, y2, w2, h2 = cv2.boundingRect(cnt2)
+        midPoint = (int)(x+x2+w2)/2
+        cv2.line(resizedImage,(midPoint,0),(midPoint,300), (0,0,255))
+        cv2.line(resizedImage,(0,150),(300,150), (0,0,255))
 
     cv2.imshow('Filled Image', resizedImage)
 
